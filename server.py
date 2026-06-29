@@ -1,29 +1,28 @@
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
 
-# Sample events data
+# Sample event data
 events = [
     {
         "id": 1,
-        "title": "Python Workshop"
+        "name": "Python Workshop",
+        "location": "Nairobi",
+        "date": "2026-07-01"
     },
     {
         "id": 2,
-        "title": "Web Development Bootcamp"
-    },
-    {
-        "id": 3,
-        "title": "Tech Meetup"
+        "name": "Tech Meetup",
+        "location": "Mombasa",
+        "date": "2026-07-10"
     }
 ]
 
-# Home Route
+
+# Home route
 @app.route("/")
 def home():
-    return jsonify({"message": "Welcome To Event Catalogue API"})
+    return jsonify({"message": "Welcome to the Event Catalog API"})
 
 
 # GET all events
@@ -32,18 +31,26 @@ def get_events():
     return jsonify(events)
 
 
-# POST new event
+# POST a new event
 @app.route("/events", methods=["POST"])
 def add_event():
     data = request.get_json()
 
     # Validate input
-    if not data or "title" not in data:
-        return jsonify({"error": "Title is required"}), 400
+    if not data:
+        return jsonify({"error": "Missing JSON data"}), 400
+
+    required_fields = ["name", "location", "date"]
+
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"'{field}' is required"}), 400
 
     new_event = {
         "id": len(events) + 1,
-        "title": data["title"]
+        "name": data["name"],
+        "location": data["location"],
+        "date": data["date"]
     }
 
     events.append(new_event)
